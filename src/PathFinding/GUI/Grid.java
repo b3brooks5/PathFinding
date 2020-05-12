@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Grid extends JPanel implements MouseMotionListener, MouseListener {
@@ -13,7 +12,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     private JPanel[][] grid;                              // grid containing the panels for display
     private int prevX, prevY;                           // x, y coordinates of previous squares
     private Color prevC = Color.LIGHT_GRAY;             // color of square last one
-    private boolean mouseDragged = false;               // if mouse is currently being dragged
+    private boolean mouseDragged = false, mouseGone = false;               // if mouse is currently being dragged
 
     private String[][] test = {{"lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
             {"red", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
@@ -64,7 +63,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     // set start and stop squares
     private void startSquares(){        // create start and end squares
         Random r = new Random();
-        int startX = 0, startY = 0, endX = 0, endY = 0;
+        int startX, startY, endX, endY;
 
         do {
             startX = r.nextInt(grid[0].length);
@@ -74,8 +73,14 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
         } while(startX == endX && startY == endY);      // run until they are different
 
-        grid[startY][startX].setBackground(Color.RED);  // set colors
-        grid[endY][endX].setBackground(Color.ORANGE);
+        if(startY < endY) {     // orange will always be on the right
+            grid[startY][startX].setBackground(Color.ORANGE);  // set colors
+            grid[endY][endX].setBackground(Color.RED);
+        }
+        else {
+            grid[startY][startX].setBackground(Color.RED);  // set colors
+            grid[endY][endX].setBackground(Color.ORANGE);
+        }
     }
 
     // change the board to the grid given by rhs
@@ -96,18 +101,20 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
     // turns string into a color object
     private Color makeColor(String color) {
-        if (color.equals("lightGrey"))
-            return Color.LIGHT_GRAY;
-        else if (color.equals("black"))
-            return Color.BLACK;
-        else if (color.equals("gray"))
-            return Color.GRAY;
-        else if (color.equals("red"))
-            return Color.RED;
-        else if (color.equals("blue"))
-            return Color.BLUE;
-        else if (color.equals("orange"))
-            return Color.ORANGE;
+        switch (color) {
+            case "lightGrey":
+                return Color.LIGHT_GRAY;
+            case "black":
+                return Color.BLACK;
+            case "gray":
+                return Color.GRAY;
+            case "red":
+                return Color.RED;
+            case "blue":
+                return Color.BLUE;
+            case "orange":
+                return Color.ORANGE;
+        }
 
         return Color.WHITE;
     }
@@ -115,7 +122,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     // paint the panel as java Color objects
     private void paintPanel() {
         for(JPanel[] row : grid) {
-            System.out.printf("\n");
+            System.out.println();
             for (JPanel c : row) {
                 System.out.printf("%-10s, ", c.getBackground());
             }
@@ -136,7 +143,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
     // print the grid 2D array as strings to stdout
     public void printStrings() {
-        String p[][] = makeStrings();
+        String[][] p = makeStrings();
 
         for(int i = 0; i < length; i++) {
             System.out.println();
@@ -186,8 +193,8 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
         int width = grid[0][0].getWidth();
         int height = grid[0][0].getHeight();
 
-        // if the square you are over isn't a start or stop square
-        if (isStartStop(e)) {
+        // if the square wasn't red or orange
+        if (!prevC.equals(Color.RED) && !prevC.equals(Color.ORANGE)) {
 
             grid[e.getX() / width][e.getY() / height].setBackground(Color.BLACK);
             prevC = Color.BLACK;
@@ -213,9 +220,10 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-        update(test);
+        //update(test);
         //printStrings();
-        //restart();
+        restart();
+        mouseGone = true;
 
         grid[prevX][prevY].setBackground(Color.LIGHT_GRAY);     // remove the grey square when mouse exits
     }
