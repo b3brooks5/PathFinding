@@ -257,7 +257,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
         //B.printGRID();
         mouseGone = true;
 
-        grid[prevX][prevY].setBackground(Color.LIGHT_GRAY);     // remove the grey square when mouse exits
+        grid[prevX][prevY].setBackground(prevC);     // remove the grey square when mouse exits
     }
 
     @Override

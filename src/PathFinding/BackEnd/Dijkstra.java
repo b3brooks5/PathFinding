@@ -1,5 +1,6 @@
 package PathFinding.BackEnd;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -82,14 +83,39 @@ public class Dijkstra {
         return null;
     }
 
-    private boolean calculateDistance(NODE rhs, double add){
+    private void calculateDistance(NODE rhs, double add){
         rhs.distance = CURRENT.distance + add;
-        return rhs.stat == status.stop;                 // return if you found the end node or not
+    }
+
+    public void restart(String[][] rhs){
+        visited.clear();
+        unvisited.clear();
+        FOUND_END = false;
+
+        init(rhs);
+    }
+
+    public void clear(){
+        visited.clear();
+        unvisited.clear();
+        FOUND_END = false;
+
+        String[][] work = new String[40][20];
+
+        for (String[] strings : work) {
+            Arrays.fill(strings, "lightGrey");
+        }
+        work[SX][SY] = "orange";
+        work[EX][EY] = "red";
+
+        init(work);
     }
 
     // calculate distances for all valid squares
     private boolean checkNodes() {
         NODE working;
+
+        //printUnvisited();
 
         working = findNode(CURRENT.X, CURRENT.Y + 1);
         if(working != null && working.stat == status.stop)

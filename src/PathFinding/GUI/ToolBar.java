@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 public class ToolBar extends JPanel implements ActionListener {
     Grid GRID;
-    boolean RUNNING = false, DIAGONALS = false;
+    boolean RUNNING = false, DIAGONALS = false, RUN = false;
     double distance;
     String speed;
     JButton refresh, clear, play;
@@ -76,43 +76,42 @@ public class ToolBar extends JPanel implements ActionListener {
         add(refresh);
 
 
-        JButton clear = new JButton("Clear");
+        clear = new JButton("Clear");
         c.gridx = 3;
         g.setConstraints(clear, c);
         clear.addActionListener(this);
         add(clear);
 
         GRID = grid;
-        Dij = new Dijkstra(GRID.makeStrings());
+        //Dij = new Dijkstra(GRID.makeStrings());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == refresh){
             GRID.restart();
+            Dij.restart(GRID.makeStrings());
+            RUN = false;
         }
         else if (e.getSource() == clear){
-            // clear and reset board with same start, stop
+            System.out.printf("In clear\n");
+            RUN = false;
+            Dij.clear();
+            GRID.update(Dij.makeStrings());
         }
-        else if(e.getSource() == play){
+        else if(e.getSource() == play && !RUN){
             //System.out.printf("Play was called\n");
             RUNNING = true;
-            //Dij =
+            Dij = new Dijkstra(GRID.makeStrings());
 
             while(!Dij.step(DIAGONALS, distance)){
-            //if(Dij.step(DIAGONALS, distance))
-            //    System.out.printf("\n\n\nIt worked\n\n\n");
-
-            //System.out.println("Running");
                 GRID.update(Dij.makeStrings());
-                //Dij.printGRID();
             }
-            //GRID.update(Dij.makeStrings());
 
+            RUN = true;
             System.out.println();
             Dij.getShortestPath();
             GRID.update(Dij.makeStrings());
-            //GRID.printStrings();
 
             RUNNING = false;
         }
