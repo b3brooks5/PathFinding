@@ -14,7 +14,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     private int prevX, prevY;                           // x, y coordinates of previous squares
     private Color prevC = Color.LIGHT_GRAY;             // color of square last one
     private boolean mouseDragged = false, mouseGone = false;               // if mouse is currently being dragged
-    private Dijkstra B;
+    //private Dijkstra B;
 
     private String[][] test = {
             {"lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
@@ -246,15 +246,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-        //update(test);
-        //printStrings();
-        //restart();
-
-//        B.step();
-//        B.makeStrings();
-//        update(B.makeStrings());
-
-        //B.printGRID();
         mouseGone = true;
 
         grid[prevX][prevY].setBackground(prevC);     // remove the grey square when mouse exits

@@ -1,9 +1,6 @@
 package PathFinding.BackEnd;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class Dijkstra {
     private enum status { unvisited, visited, wall, start, stop, path }     // nodes status
@@ -30,14 +27,14 @@ public class Dijkstra {
                 if(strings[i][j].equals("red")){            // end square
                     EX = i;
                     EY = j;
-                    System.out.printf("EX: %s\tEY: %d\n", EX, EY);
                 }
                 unvisited.add(new NODE(makeStatus(strings[i][j]), 1000.0, i, j));   // add all squares
             }
         getStart(); // get the x, y values of start
     }
 
-    private status makeStatus(String str){      // return converted status
+    // return converted status
+    private status makeStatus(String str){
         if(str.equals("black"))
             return status.wall;
         else if(str.equals("orange"))
@@ -48,7 +45,8 @@ public class Dijkstra {
             return status.unvisited;  // default to unknown
     }
 
-    private void getStart(){            // sets coordinate of the start index
+    // sets coordinate of the start index
+    private void getStart(){
         Iterator<NODE> itr = unvisited.iterator();
         while(itr.hasNext()){
             NODE working = itr.next();
@@ -83,10 +81,12 @@ public class Dijkstra {
         return null;
     }
 
+    // calculates the new distance
     private void calculateDistance(NODE rhs, double add){
         rhs.distance = CURRENT.distance + add;
     }
 
+    // restart the board with new start and stop points
     public void restart(String[][] rhs){
         visited.clear();
         unvisited.clear();
@@ -95,27 +95,22 @@ public class Dijkstra {
         init(rhs);
     }
 
+    // cleared the grid but keeps the same start and stop positions
     public void clear(){
-        visited.clear();
-        unvisited.clear();
-        FOUND_END = false;
-
-        String[][] work = new String[40][20];
+        String[][] work = new String[40][20];       // new empty GRID
 
         for (String[] strings : work) {
             Arrays.fill(strings, "lightGrey");
         }
-        work[SX][SY] = "orange";
+        work[SX][SY] = "orange";        // use old start, stop
         work[EX][EY] = "red";
 
-        init(work);
+        restart(work);      // restart with newly created board
     }
 
     // calculate distances for all valid squares
     private boolean checkNodes() {
         NODE working;
-
-        //printUnvisited();
 
         working = findNode(CURRENT.X, CURRENT.Y + 1);
         if(working != null && working.stat == status.stop)
@@ -139,45 +134,66 @@ public class Dijkstra {
         return false;
     }
 
-    public boolean step(boolean Diagonals, double distance) {             // returns true if end tile found
+    public int step(boolean Diagonals, double distance) {             // returns true if end tile found
         for(int i = 0; i < STEP_SIZE; i++) {
             CURRENT = getSmallestDistance();        // get the node with the smallest distance
+
+            if(CURRENT.stat == status.wall && CURRENT.distance == 1000.0 && CURRENT.X == 0 && CURRENT.Y == 0)
+                return -1;
+
             FOUND_END = checkNodes();               // check all it's neighbors
             unvisited.remove(CURRENT);
             CURRENT.stat = status.visited;
             visited.add(CURRENT);
 
-            //printUnvisited();
-            if(FOUND_END){      // if we found the end tile
-                //getShortestPath();
-                return true;
-            }
+            if(FOUND_END)      // if we found the end tile
+                return 0;
         }
-        return false;
+        return 1;
     }
 
-    public void getShortestPath(){
-        double min;
-        NODE current = GRID[EX][EY];
+    // finds the min of two nodes
+    private NODE myMin(NODE r, NODE l){
+        if(l.distance < r.distance)     // return l if it's less then r
+            return l;
+        else return r;      // otherwise keep r
+    }
 
-        while(current.distance != 0.0) {        // while not at start
-            min = Math.min(GRID[current.X + 1][current.Y].distance, GRID[current.X - 1][current.Y].distance);
-            min = Math.min(min, GRID[current.X][current.Y + 1].distance);
-            min = Math.min(min, GRID[current.X][current.Y - 1].distance);     // min now has the shortest distance arround the current node
+    // changes the color of the tiles that make up the shortest path of the algorithm
+    public void getShortestPath() {
+        NODE current = GRID[EX][EY];                        // the current node start at the stop node
+        ArrayList<NODE> neighbors = new ArrayList<>();      // stores the neighbors of the current
+        NODE smallest = null;                                // node for changing values
 
-            current.stat = status.path;     // make blue
+        while(current.distance != 0.0) {
+            if (current.X + 1 < 40)                                // if statements grab all neighboring nodes
+                neighbors.add(GRID[current.X + 1][current.Y]);          // and first checks if they are in the grid
+                                                                        // and not null
+            if (current.X - 1 >= 0)
+                neighbors.add(GRID[current.X - 1][current.Y]);
 
-            if (min == GRID[current.X + 1][current.Y].distance)         // set current to lowest distance
-                current = GRID[current.X + 1][current.Y];
-            else if (min == GRID[current.X - 1][current.Y].distance)
-                current = GRID[current.X - 1][current.Y];
-            else if (min == GRID[current.X][current.Y + 1].distance)
-                current = GRID[current.X][current.Y + 1];
-            else if (min == GRID[current.X][current.Y - 1].distance)
-                current = GRID[current.X][current.Y - 1];
+            if (current.Y + 1 < 20)
+                neighbors.add(GRID[current.X][current.Y + 1]);
 
-        }
-    }   // en get shortest path
+            if (current.Y - 1 >= 0)
+                neighbors.add(GRID[current.X][current.Y - 1]);
+
+            if (neighbors.size() >= 1) {            // get the smallest node
+                smallest = neighbors.get(0);
+                for (int i = 0; i < neighbors.size(); i++) {
+                    smallest = myMin(smallest, neighbors.get(i));
+                    System.out.println(neighbors.get(i));
+                }
+            }
+            else{
+                System.out.println("ERROR: Working is NULL");
+            }
+
+            current.stat = status.path;     // change color for printing
+            current = smallest;
+            neighbors.clear();              // clear for next loop
+        }   // end while loop
+    }   // end getShortestPath
 
     // makes the entire GRID into a 2D array of strings based on color of tiles
     public String[][] makeStrings() {
@@ -228,6 +244,26 @@ public class Dijkstra {
         System.out.println();
     }
 
+    public void printDistances(){
+        makeGrid();
+        for(int i = 0; i < 40; i++){
+            System.out.printf("%-9d", i);
+        }
+
+        for(int i = 0; i < GRID[0].length; i++){
+            System.out.println();
+            for(int j = 0; j < GRID.length; j++){
+                System.out.printf("%-7.2f, ", GRID[j][i].distance);
+            }
+        }
+//        for(NODE[] row : GRID) {
+//            System.out.println();
+//            for (NODE n : row) {
+//                System.out.printf("%-7.2f, ", n.distance);
+//            }
+//        }
+    }
+
     public void printUnvisited(){
         for(NODE n : unvisited) {
             System.out.println(n);
@@ -238,13 +274,6 @@ public class Dijkstra {
         private status stat;        // status of node
         private double distance;       // distance from start to this node
         int X, Y;
-
-//        public NODE() {
-//            stat = status.unvisited;
-//            distance = 0.0;
-//            X = 0;
-//            Y = 0;
-//        }
 
         public NODE(status s, double d, int x, int y) {
             stat = s;

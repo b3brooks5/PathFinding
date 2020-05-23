@@ -8,11 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ToolBar extends JPanel implements ActionListener {
-    Grid GRID;
+    Grid GRID;      // same grid in grid.java
     boolean RUNNING = false, DIAGONALS = false, RUN = false;
     double distance;
     String speed;
-    JButton refresh, clear, play;
+
+    // GUI buttons
+    JButton refresh, clear, play, template;
     Checkbox check;
     Dijkstra Dij;
 
@@ -25,16 +27,16 @@ public class ToolBar extends JPanel implements ActionListener {
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
 
-        c.gridx = 0;
+        c.gridx = 0;        // starting coordinates
         c.gridy = 0;
         c.gridwidth = 1;
-        check = new Checkbox("Allow diagonals", false);
+        check = new Checkbox("Allow diagonals", false); // allow diagonals
         g.setConstraints(check, c);
         add(check);
 
         c.gridx = 1;
         c.gridy = 0;
-        JLabel distnace = new JLabel("Diagonal distance");
+        JLabel distnace = new JLabel("Diagonal distance");      // set diagonal distance
         g.setConstraints(distnace, c);
         add(distnace);
 
@@ -46,76 +48,91 @@ public class ToolBar extends JPanel implements ActionListener {
         g.setConstraints(diagonal, c);
         add(diagonal);
 
-        //c.gridwidth = GridBagConstraints.REMAINDER;     // end of line
-        play = new JButton("Play");
+        play = new JButton("Play");                     // play button
         c.gridx = 3;
         g.setConstraints(play, c);
         play.addActionListener(this);
         add(play);
+        // end of row 1
 
-        //c.gridwidth = GridBagConstraints.RELATIVE;
         JLabel s = new JLabel("Speed");
         c.gridx = 0;
         c.gridy = 1;
         g.setConstraints(s, c);
         add(s);
 
-        String[] speedOptions = {"slow", "normal", "fast", "finish"};
+        String[] speedOptions = {"slow", "normal", "fast", "finish"};   // drop box for speed
         JComboBox<String> speed = new JComboBox<String>(speedOptions);
         diagonal.setSelectedIndex(0);
-        //c.gridwidth = GridBagConstraints.REMAINDER;
         c.gridx = 1;
         c.gridy = 1;
         g.setConstraints(speed, c);
         add(speed);
 
-        refresh = new JButton("Refresh");
+        refresh = new JButton("Refresh");           // get an all new board
         c.gridx = 2;
         g.setConstraints(refresh, c);
         refresh.addActionListener(this);
         add(refresh);
 
 
-        clear = new JButton("Clear");
+        clear = new JButton("Clear");               // clear the board with the same start, stop
         c.gridx = 3;
         g.setConstraints(clear, c);
         clear.addActionListener(this);
         add(clear);
 
+        template = new JButton("Template");         // preset design to run
+        c.gridx = 4;
+        g.setConstraints(template, c);
+        template.addActionListener(this);
+        add(template);
+
         GRID = grid;
-        //Dij = new Dijkstra(GRID.makeStrings());
+    }
+
+    private void clear(){       // general function used to clear the board
+        RUN = false;
+        if(Dij != null) {
+            Dij.clear();
+            GRID.update(Dij.makeStrings());
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == refresh){
+        if(e.getSource() == refresh){           // restart the board
             GRID.restart();
-            Dij.restart(GRID.makeStrings());
+            if(Dij != null)
+                Dij.restart(GRID.makeStrings());
             RUN = false;
         }
-        else if (e.getSource() == clear){
-            System.out.printf("In clear\n");
-            RUN = false;
-            Dij.clear();
-            GRID.update(Dij.makeStrings());
+        else if (e.getSource() == clear){       // clears the board with the same start, stop
+            clear();
         }
         else if(e.getSource() == play && !RUN){
-            //System.out.printf("Play was called\n");
-            RUNNING = true;
+            int stepping = 1;
+            RUNNING = true;         // true if currently finding path, needs to block other buttons from executing
             Dij = new Dijkstra(GRID.makeStrings());
 
-            while(!Dij.step(DIAGONALS, distance)){
+            while(stepping == 1){                       // while you can still step
+                stepping = Dij.step(DIAGONALS, distance);
+
+                if(stepping == -1){     // the stop tile cannot be reached
+                    clear();
+                    return;
+                }
                 GRID.update(Dij.makeStrings());
             }
 
             RUN = true;
-            System.out.println();
+
             Dij.getShortestPath();
             GRID.update(Dij.makeStrings());
 
-            RUNNING = false;
+            RUNNING = false;            // program is now no longer running
         }
-        else if (e.getSource() == check){
+        else if (e.getSource() == check){       // if diagonals are allowed
             RUNNING = true;
         }
     }
