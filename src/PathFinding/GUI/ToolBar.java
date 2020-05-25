@@ -1,94 +1,87 @@
 package PathFinding.GUI;
 
 import PathFinding.BackEnd.Dijkstra;
+import PathFinding.BackEnd.Templates;
 
 import javax.swing.*;
+import javax.tools.Diagnostic;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.TimeUnit;
 
 public class ToolBar extends JPanel implements ActionListener {
     Grid GRID;      // same grid in grid.java
     boolean RUNNING = false, DIAGONALS = false, RUN = false;
     double distance;
     String speed;
+    Templates temp;
 
     // GUI buttons
     JButton refresh, clear, play, template;
-    Checkbox check;
+    JCheckBox check;
     Dijkstra Dij;
+    JComboBox<Double> Dbox;
 
-    public ToolBar(Grid grid) {
+    public ToolBar(Grid grid, Templates t) {
         super();
 
-        GridBagLayout g = new GridBagLayout();
-        setLayout(g);
-
+        setLayout(new GridLayout(3, 3));
         GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.WEST;
 
-        c.gridx = 0;        // starting coordinates
-        c.gridy = 0;
-        c.gridwidth = 1;
-        check = new Checkbox("Allow diagonals", false); // allow diagonals
-        g.setConstraints(check, c);
-        add(check);
+        check = new JCheckBox("Allow Diagonals", false);
+        check.addActionListener(this);
+        add(check, c);
 
-        c.gridx = 1;
-        c.gridy = 0;
-        JLabel distnace = new JLabel("Diagonal distance");      // set diagonal distance
-        g.setConstraints(distnace, c);
-        add(distnace);
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(1, 2));
 
-        Double[] sizeOptions = {1.0, 1.5, 2.0};
-        JComboBox<Double> diagonal = new JComboBox<Double>(sizeOptions);
-        diagonal.setSelectedIndex(0);
-        c.gridx = 2;
-        c.gridwidth = 1;
-        g.setConstraints(diagonal, c);
-        add(diagonal);
+        JLabel l = new JLabel("Diagonal Distance");
 
-        play = new JButton("Play");                     // play button
-        c.gridx = 3;
-        g.setConstraints(play, c);
-        play.addActionListener(this);
-        add(play);
-        // end of row 1
+        Double[] sizeOptions = {1.0, 1.5, 2.0, 2.1, 2.5, 5.0};
+        Dbox = new JComboBox<Double>(sizeOptions);
+        Dbox.setSelectedIndex(0);
+        Dbox.addActionListener(this);
 
-        JLabel s = new JLabel("Speed");
-        c.gridx = 0;
-        c.gridy = 1;
-        g.setConstraints(s, c);
-        add(s);
+        p.add(l);
+        p.add(Dbox);
+
+        //add(p, c);
+
+        template = new JButton("Template");
+        template.addActionListener(this);
+        add(template, c);
+
+
+        JPanel p2 = new JPanel();
+        p2.setLayout(new GridLayout(1, 2));
 
         String[] speedOptions = {"slow", "normal", "fast", "finish"};   // drop box for speed
         JComboBox<String> speed = new JComboBox<String>(speedOptions);
-        diagonal.setSelectedIndex(0);
-        c.gridx = 1;
-        c.gridy = 1;
-        g.setConstraints(speed, c);
-        add(speed);
+        speed.setSelectedIndex(3);
 
-        refresh = new JButton("Refresh");           // get an all new board
-        c.gridx = 2;
-        g.setConstraints(refresh, c);
+        JLabel s = new JLabel("Speed");
+
+        p2.add(s);
+        p2.add(speed);
+
+        add(p2, c);
+
+        refresh = new JButton("Refresh");
         refresh.addActionListener(this);
-        add(refresh);
+        add(refresh, c);
 
-
-        clear = new JButton("Clear");               // clear the board with the same start, stop
-        c.gridx = 3;
-        g.setConstraints(clear, c);
+        clear = new JButton("clear");
         clear.addActionListener(this);
-        add(clear);
+        add(clear, c);
 
-        template = new JButton("Template");         // preset design to run
-        c.gridx = 4;
-        g.setConstraints(template, c);
-        template.addActionListener(this);
-        add(template);
+        play = new JButton("Play");
+        play.addActionListener(this);
+        add(play, c);
 
         GRID = grid;
+        distance = 1.0;
+        temp = t;
     }
 
     private void clear(){       // general function used to clear the board
@@ -119,21 +112,37 @@ public class ToolBar extends JPanel implements ActionListener {
                 stepping = Dij.step(DIAGONALS, distance);
 
                 if(stepping == -1){     // the stop tile cannot be reached
+                    JOptionPane.showMessageDialog(null, "The red square cannot be reached");
                     clear();
                     return;
                 }
-                GRID.update(Dij.makeStrings());
+                GRID.update(Dij.makeStrings());     // make string and update board
+
+//                try {
+//                    TimeUnit.SECONDS.sleep(1);
+//                } catch (InterruptedException ex) {
+//                    ex.printStackTrace();
+//                }
             }
 
             RUN = true;
 
-            Dij.getShortestPath();
+            System.out.println();
+            Dij.printDistances();
+
+            Dij.getShortestPath(DIAGONALS);
             GRID.update(Dij.makeStrings());
 
             RUNNING = false;            // program is now no longer running
         }
-        else if (e.getSource() == check){       // if diagonals are allowed
-            RUNNING = true;
+        else if (e.getSource() == check && !RUNNING){       // if diagonals are allowed
+            DIAGONALS = check.isSelected();     // set diagonals to the value of the checkbox
+        }
+        else if(e.getSource() == Dbox && !RUNNING){
+            distance = (double)Dbox.getSelectedItem();
+        }
+        else if(e.getSource() == template && !RUNNING){
+            GRID.update(temp.getNext());
         }
     }
 }

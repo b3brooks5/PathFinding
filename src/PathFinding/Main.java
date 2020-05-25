@@ -1,4 +1,5 @@
 package PathFinding;
+import PathFinding.BackEnd.Templates;
 import PathFinding.GUI.*;
 import javax.swing.*;
 import java.awt.*;
@@ -9,13 +10,16 @@ public class Main {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setSize(900, 600);
+
         frame.setLayout(new BorderLayout());
 
-        Grid grid = new Grid();
+        Templates temp = new Templates();
+
+        Grid grid = new Grid(temp);
 
         frame.add(grid, BorderLayout.CENTER);
 
-        ToolBar t = new ToolBar(grid);
+        ToolBar t = new ToolBar(grid, temp);
         frame.add(t, BorderLayout.NORTH);
 
         Algorithms algo = new Algorithms();

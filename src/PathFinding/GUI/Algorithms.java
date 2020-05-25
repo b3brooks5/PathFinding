@@ -16,11 +16,11 @@ public class Algorithms extends JPanel implements ActionListener {
         JLabel title = new JLabel("Algorithms");
         add(title);
 
-        Dijkstra = new JRadioButton("Dijkstra's algorithm");
+        Dijkstra = new JRadioButton("Dijkstra's", true);
         Dijkstra.addActionListener(this);
         add(Dijkstra);
 
-        AStar = new JRadioButton("A* Algorithm");
+        AStar = new JRadioButton("A*");
         AStar.addActionListener(this);
         add(AStar);
     }

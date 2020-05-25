@@ -1,5 +1,6 @@
 package PathFinding.GUI;
 import PathFinding.BackEnd.Dijkstra;
+import PathFinding.BackEnd.Templates;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +15,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     private int prevX, prevY;                           // x, y coordinates of previous squares
     private Color prevC = Color.LIGHT_GRAY;             // color of square last one
     private boolean mouseDragged = false, mouseGone = false;               // if mouse is currently being dragged
-    //private Dijkstra B;
+    private Templates temp;
 
     private String[][] test = {
             {"lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
@@ -58,13 +59,15 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
             {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
             {"lightGrey", "lightGrey", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"}};
 
-    public Grid() {
+    public Grid(Templates t) {
         super();
 
         setLayout(new GridLayout(height,width));
         addMouseMotionListener(this);
         addMouseListener(this);
         setSize(900, 400);
+
+        temp = t;
 
         init();
     }
@@ -104,7 +107,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     public void update(String [][] rhs){        // changes the grid to the new layout
         for(int i = 0; i < width; i++)         // change sll panel colors to new colors
             for(int j = 0; j < height; j++) {
-                //System.out.printf("%s, ",rhs[i][j]);
                 grid[i][j].setBackground(makeColor(rhs[i][j]));
             }
         revalidate();
@@ -116,7 +118,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
             for (JPanel t : tiles)
                 t.setBackground(Color.LIGHT_GRAY);
         startSquares();
-        //B = new Dijkstra();
     }
 
     // turns string into a color object
@@ -168,9 +169,9 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
         String[][] p = makeStrings();
 
         for(int i = 0; i < height; i++) {
-            System.out.println();
+            System.out.println("},");
             for (int j = 0; j < width; j++) {
-                System.out.printf("%-10s", p[j][i]);
+                System.out.printf("\"%s\", ", p[j][i]);
             }
         }
     }
@@ -224,6 +225,8 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
             grid[e.getX() / width][e.getY() / height].setBackground(Color.BLACK);
             prevC = Color.BLACK;
         }
+        temp.startOver();
+
         //B = new Dijkstra(makeStrings());
     }
 

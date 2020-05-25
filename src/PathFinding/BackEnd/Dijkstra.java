@@ -51,7 +51,6 @@ public class Dijkstra {
         while(itr.hasNext()){
             NODE working = itr.next();
             if(working.getStatus() == status.start) {
-                System.out.println(working.getStatus());
                 working.setDistance(0);
             }
         }
@@ -59,16 +58,17 @@ public class Dijkstra {
 
     // returns the node with the smallest distance in unvisited
     private NODE getSmallestDistance() {
-        NODE ret = new NODE(status.wall, 1000.0, -1, -1);
-        double smallest = 1000.0;
+        NODE ret = new NODE(status.wall, 1001.0, -1, -1);
+        double smallest = 1001.0;
 
+        System.out.println(unvisited);
         for(NODE n : unvisited) {
-            if (n.distance < smallest){
+            if (n.distance < smallest) {
                 smallest = n.distance;
                 ret = n;
             }
         }
-
+        System.out.println(ret);
         return ret;
     }
 
@@ -83,7 +83,9 @@ public class Dijkstra {
 
     // calculates the new distance
     private void calculateDistance(NODE rhs, double add){
-        rhs.distance = CURRENT.distance + add;
+        double dis = CURRENT.distance + add;
+        if(dis < rhs.distance)
+            rhs.distance = CURRENT.distance + add;
     }
 
     // restart the board with new start and stop points
@@ -108,29 +110,42 @@ public class Dijkstra {
         restart(work);      // restart with newly created board
     }
 
-    // calculate distances for all valid squares
-    private boolean checkNodes() {
+    // Check one node
+    private void oneNode(int x, int y, double add){
         NODE working;
 
-        working = findNode(CURRENT.X, CURRENT.Y + 1);
-        if(working != null && working.stat == status.stop)
-            return true;
+        working = findNode(x, y);
+        if(working != null && (working.stat == status.unvisited || working.stat ==  status.stop)) {
+            calculateDistance(working, add);
+        }
+    }
 
-        if(working != null && working.stat == status.unvisited) {
-            calculateDistance(working, 1.0);
+    // calculate distances for all valid squares
+    private boolean checkNodes(boolean Diagonals, double add) {
+        NODE working;
+
+        working = findNode(CURRENT.X, CURRENT.Y);
+
+        System.out.println("Working: " + working);
+        if(CURRENT != null && CURRENT.stat == status.stop) {
+            System.out.println("It ran");
+            return true;
         }
-        working = findNode(CURRENT.X, CURRENT.Y - 1);
-        if(working != null && working.stat == status.unvisited) {
-            calculateDistance(working, 1.0);
+
+        if(Diagonals){  // we are allowing diagonals
+            oneNode(CURRENT.X + 1, CURRENT.Y + 1, add);
+            oneNode(CURRENT.X + 1, CURRENT.Y - 1, add);
+            oneNode(CURRENT.X - 1, CURRENT.Y + 1, add);
+            oneNode(CURRENT.X - 1, CURRENT.Y - 1, add);
         }
-        working = findNode(CURRENT.X + 1, CURRENT.Y);
-        if(working != null && working.stat == status.unvisited) {
-            calculateDistance(working, 1.0);
-        }
-        working = findNode(CURRENT.X - 1, CURRENT.Y);
-        if(working != null && working.stat == status.unvisited) {
-            calculateDistance(working, 1.0);
-        }
+
+        oneNode(CURRENT.X, CURRENT.Y + 1, 1.0);
+        oneNode(CURRENT.X, CURRENT.Y - 1, 1.0);
+        oneNode(CURRENT.X + 1, CURRENT.Y, 1.0);
+        oneNode(CURRENT.X - 1, CURRENT.Y, 1.0);
+
+
+
         return false;
     }
 
@@ -138,11 +153,13 @@ public class Dijkstra {
         for(int i = 0; i < STEP_SIZE; i++) {
             CURRENT = getSmallestDistance();        // get the node with the smallest distance
 
-            if(CURRENT.stat == status.wall && CURRENT.distance == 1000.0 && CURRENT.X == 0 && CURRENT.Y == 0)
+            if(CURRENT.stat == status.wall && CURRENT.distance == 1001.0 && CURRENT.X == 0 && CURRENT.Y == 0)
                 return -1;
-
-            FOUND_END = checkNodes();               // check all it's neighbors
+            System.out.println("Current stat: " + CURRENT.stat);
+            FOUND_END = checkNodes(Diagonals, distance);               // check all it's neighbors
+            System.out.println(FOUND_END);
             unvisited.remove(CURRENT);
+
             CURRENT.stat = status.visited;
             visited.add(CURRENT);
 
@@ -160,7 +177,7 @@ public class Dijkstra {
     }
 
     // changes the color of the tiles that make up the shortest path of the algorithm
-    public void getShortestPath() {
+    public void getShortestPath(boolean Diagonal) {
         NODE current = GRID[EX][EY];                        // the current node start at the stop node
         ArrayList<NODE> neighbors = new ArrayList<>();      // stores the neighbors of the current
         NODE smallest = null;                                // node for changing values
@@ -178,11 +195,25 @@ public class Dijkstra {
             if (current.Y - 1 >= 0)
                 neighbors.add(GRID[current.X][current.Y - 1]);
 
+            if(Diagonal){       // diagonals were alloed
+                if (current.X + 1 < 40 && current.Y + 1 < 20)
+                    neighbors.add(GRID[current.X + 1][current.Y + 1]);
+
+                if (current.X + 1 < 40 && current.Y - 1 >= 0)
+                    neighbors.add(GRID[current.X + 1][current.Y - 1]);
+
+                if ( current.X - 1 >= 0 && current.Y + 1 < 20)
+                    neighbors.add(GRID[current.X - 1][current.Y + 1]);
+
+                if (current.X - 1 >= 0 && current.Y - 1 >= 0)
+                    neighbors.add(GRID[current.X - 1][current.Y - 1]);
+            }
+
+
             if (neighbors.size() >= 1) {            // get the smallest node
                 smallest = neighbors.get(0);
                 for (int i = 0; i < neighbors.size(); i++) {
                     smallest = myMin(smallest, neighbors.get(i));
-                    System.out.println(neighbors.get(i));
                 }
             }
             else{
@@ -218,7 +249,6 @@ public class Dijkstra {
             }
         }
         ret[SX][SY] = "orange";     // always show start and stop
-        //System.out.printf("SX: %d\tSY: %d\n", SX, SY);
         ret[EX][EY] = "red";
 
         return ret;
