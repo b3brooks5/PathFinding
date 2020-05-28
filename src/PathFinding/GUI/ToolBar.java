@@ -1,14 +1,14 @@
 package PathFinding.GUI;
 
-import PathFinding.BackEnd.Dijkstra;
+import PathFinding.BackEnd.Algiorithms.Algorithm;
+import PathFinding.BackEnd.Algiorithms.AStar;
+import PathFinding.BackEnd.Algiorithms.Dijkstra;
 import PathFinding.BackEnd.Templates;
 
 import javax.swing.*;
-import javax.tools.Diagnostic;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.TimeUnit;
 
 public class ToolBar extends JPanel implements ActionListener {
     Grid GRID;      // same grid in grid.java
@@ -18,12 +18,14 @@ public class ToolBar extends JPanel implements ActionListener {
     Templates temp;
 
     // GUI buttons
+    JRadioButton Dijkstra, AStar;
     JButton refresh, clear, play, template;
     JCheckBox check;
-    Dijkstra Dij;
+    //Dijkstra Dij;
+    Algorithm algo;
     JComboBox<Double> Dbox;
 
-    public ToolBar(Grid grid, Templates t) {
+    public ToolBar(Grid grid, Templates t, JRadioButton Dij, JRadioButton As) {
         super();
 
         setLayout(new GridLayout(3, 3));
@@ -45,8 +47,6 @@ public class ToolBar extends JPanel implements ActionListener {
 
         p.add(l);
         p.add(Dbox);
-
-        //add(p, c);
 
         template = new JButton("Template");
         template.addActionListener(this);
@@ -82,13 +82,15 @@ public class ToolBar extends JPanel implements ActionListener {
         GRID = grid;
         distance = 1.0;
         temp = t;
+        Dijkstra = Dij;
+        AStar = As;
     }
 
     private void clear(){       // general function used to clear the board
         RUN = false;
-        if(Dij != null) {
-            Dij.clear();
-            GRID.update(Dij.makeStrings());
+        if(algo != null) {
+            algo.clear();
+            GRID.update(algo.makeStrings());
         }
     }
 
@@ -96,27 +98,41 @@ public class ToolBar extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == refresh){           // restart the board
             GRID.restart();
-            if(Dij != null)
-                Dij.restart(GRID.makeStrings());
+            if(algo != null)
+                algo.restart(GRID.makeStrings());
             RUN = false;
+            temp.startOver();
         }
         else if (e.getSource() == clear){       // clears the board with the same start, stop
             clear();
+            temp.startOver();       // templates will now start from first template
         }
         else if(e.getSource() == play && !RUN){
             int stepping = 1;
+
             RUNNING = true;         // true if currently finding path, needs to block other buttons from executing
-            Dij = new Dijkstra(GRID.makeStrings());
+
+            if(Dijkstra.isSelected()){
+                System.out.println("Creating Dikjkastras");
+                algo = new Dijkstra(GRID.makeStrings());
+            }
+            else if (AStar.isSelected())
+                algo = new AStar(GRID.makeStrings());
+            else{
+                System.out.println("Their was a problem initializing");
+                return;
+            }
+
 
             while(stepping == 1){                       // while you can still step
-                stepping = Dij.step(DIAGONALS, distance);
+                stepping = algo.step(DIAGONALS);
 
                 if(stepping == -1){     // the stop tile cannot be reached
                     JOptionPane.showMessageDialog(null, "The red square cannot be reached");
                     clear();
                     return;
                 }
-                GRID.update(Dij.makeStrings());     // make string and update board
+                GRID.update(algo.makeStrings());     // make string and update board
 
 //                try {
 //                    TimeUnit.SECONDS.sleep(1);
@@ -124,14 +140,11 @@ public class ToolBar extends JPanel implements ActionListener {
 //                    ex.printStackTrace();
 //                }
             }
-
+            temp.startOver();
             RUN = true;
 
-            System.out.println();
-            Dij.printDistances();
-
-            Dij.getShortestPath(DIAGONALS);
-            GRID.update(Dij.makeStrings());
+            //algo.getShortestPath(DIAGONALS);
+            GRID.update(algo.makeStrings());
 
             RUNNING = false;            // program is now no longer running
         }
@@ -142,6 +155,7 @@ public class ToolBar extends JPanel implements ActionListener {
             distance = (double)Dbox.getSelectedItem();
         }
         else if(e.getSource() == template && !RUNNING){
+            clear();
             GRID.update(temp.getNext());
         }
     }

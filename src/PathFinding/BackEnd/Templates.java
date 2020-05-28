@@ -1,6 +1,5 @@
 package PathFinding.BackEnd;
 
-import javafx.scene.effect.Blend;
 
 public class Templates {
     String[][][] TEMPLATES;
@@ -14,8 +13,9 @@ public class Templates {
 
     public String[][] getNext(){
         String[][] ret = TEMPLATES[index];
+
         index++;
-        if(index == numTemplates)   // reset to beginning
+        if(index == numTemplates - 1)   // reset to beginning
             index = 0;
         return ret;
     }
@@ -140,9 +140,6 @@ public class Templates {
 
     private String[][] changeDirection(String[][] c){
         String[][] ret = new String[40][20];
-
-        System.out.println(c[0].length);
-        System.out.println(c.length);
 
         for(int i = 0; i < c.length; i++){      // x
             for(int j = 0; j < c[0].length; j++){   // y

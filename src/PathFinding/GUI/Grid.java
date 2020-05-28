@@ -1,5 +1,4 @@
 package PathFinding.GUI;
-import PathFinding.BackEnd.Dijkstra;
 import PathFinding.BackEnd.Templates;
 
 import javax.swing.*;
@@ -16,48 +15,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     private Color prevC = Color.LIGHT_GRAY;             // color of square last one
     private boolean mouseDragged = false, mouseGone = false;               // if mouse is currently being dragged
     private Templates temp;
-
-    private String[][] test = {
-            {"lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"red", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "orange", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "black", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"},
-            {"lightGrey", "lightGrey", "lightGrey", "black", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey", "lightGrey", "lightGrey", "lightGrey", "lightGrey","lightGrey"}};
 
     public Grid(Templates t) {
         super();
@@ -227,7 +184,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
         }
         temp.startOver();
 
-        //B = new Dijkstra(makeStrings());
+        temp.startOver();
     }
 
     @Override

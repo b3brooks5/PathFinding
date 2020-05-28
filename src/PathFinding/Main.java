@@ -1,6 +1,8 @@
 package PathFinding;
 import PathFinding.BackEnd.Templates;
 import PathFinding.GUI.*;
+import javafx.scene.control.RadioButton;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -14,15 +16,17 @@ public class Main {
         frame.setLayout(new BorderLayout());
 
         Templates temp = new Templates();
+        JRadioButton Dijkstra = new JRadioButton("Dijkstra's", true);
+        JRadioButton Astar = new JRadioButton("A*");;
 
         Grid grid = new Grid(temp);
 
         frame.add(grid, BorderLayout.CENTER);
 
-        ToolBar t = new ToolBar(grid, temp);
+        ToolBar t = new ToolBar(grid, temp, Dijkstra, Astar);
         frame.add(t, BorderLayout.NORTH);
 
-        Algorithms algo = new Algorithms();
+        AlgorithmsSideBar algo = new AlgorithmsSideBar(Dijkstra, Astar);
         frame.add(algo, BorderLayout.WEST);
 
         frame.setResizable(false);

@@ -1,8 +1,8 @@
-package PathFinding.BackEnd;
+package PathFinding.BackEnd.Algiorithms;
 
 import java.util.*;
 
-public class Dijkstra {
+public class Dijkstra extends Algorithm{
     private enum status { unvisited, visited, wall, start, stop, path }     // nodes status
     private NODE[][] GRID = new NODE[40][20];    // grid to find path in
     boolean FOUND_END = false;                   // only true if found true and done
@@ -61,14 +61,13 @@ public class Dijkstra {
         NODE ret = new NODE(status.wall, 1001.0, -1, -1);
         double smallest = 1001.0;
 
-        System.out.println(unvisited);
         for(NODE n : unvisited) {
             if (n.distance < smallest) {
                 smallest = n.distance;
                 ret = n;
             }
         }
-        System.out.println(ret);
+
         return ret;
     }
 
@@ -82,10 +81,10 @@ public class Dijkstra {
     }
 
     // calculates the new distance
-    private void calculateDistance(NODE rhs, double add){
-        double dis = CURRENT.distance + add;
+    private void calculateDistance(NODE rhs){
+        double dis = CURRENT.distance + 1;
         if(dis < rhs.distance)
-            rhs.distance = CURRENT.distance + add;
+            rhs.distance = CURRENT.distance + 1;
     }
 
     // restart the board with new start and stop points
@@ -111,60 +110,53 @@ public class Dijkstra {
     }
 
     // Check one node
-    private void oneNode(int x, int y, double add){
+    private void oneNode(int x, int y){
         NODE working;
 
         working = findNode(x, y);
         if(working != null && (working.stat == status.unvisited || working.stat ==  status.stop)) {
-            calculateDistance(working, add);
+            calculateDistance(working);
         }
     }
 
     // calculate distances for all valid squares
-    private boolean checkNodes(boolean Diagonals, double add) {
-        NODE working;
-
-        working = findNode(CURRENT.X, CURRENT.Y);
-
-        System.out.println("Working: " + working);
-        if(CURRENT != null && CURRENT.stat == status.stop) {
-            System.out.println("It ran");
+    private boolean checkNodes(boolean Diagonals) {
+        if(CURRENT != null && CURRENT.stat == status.stop)
             return true;
-        }
 
         if(Diagonals){  // we are allowing diagonals
-            oneNode(CURRENT.X + 1, CURRENT.Y + 1, add);
-            oneNode(CURRENT.X + 1, CURRENT.Y - 1, add);
-            oneNode(CURRENT.X - 1, CURRENT.Y + 1, add);
-            oneNode(CURRENT.X - 1, CURRENT.Y - 1, add);
+            oneNode(CURRENT.X + 1, CURRENT.Y + 1);
+            oneNode(CURRENT.X + 1, CURRENT.Y - 1);
+            oneNode(CURRENT.X - 1, CURRENT.Y + 1);
+            oneNode(CURRENT.X - 1, CURRENT.Y - 1);
         }
 
-        oneNode(CURRENT.X, CURRENT.Y + 1, 1.0);
-        oneNode(CURRENT.X, CURRENT.Y - 1, 1.0);
-        oneNode(CURRENT.X + 1, CURRENT.Y, 1.0);
-        oneNode(CURRENT.X - 1, CURRENT.Y, 1.0);
+        oneNode(CURRENT.X, CURRENT.Y + 1);
+        oneNode(CURRENT.X, CURRENT.Y - 1);
+        oneNode(CURRENT.X + 1, CURRENT.Y);
+        oneNode(CURRENT.X - 1, CURRENT.Y);
 
 
 
         return false;
     }
 
-    public int step(boolean Diagonals, double distance) {             // returns true if end tile found
+    public int step(boolean Diagonals) {             // returns true if end tile found
         for(int i = 0; i < STEP_SIZE; i++) {
             CURRENT = getSmallestDistance();        // get the node with the smallest distance
 
             if(CURRENT.stat == status.wall && CURRENT.distance == 1001.0 && CURRENT.X == 0 && CURRENT.Y == 0)
                 return -1;
-            System.out.println("Current stat: " + CURRENT.stat);
-            FOUND_END = checkNodes(Diagonals, distance);               // check all it's neighbors
-            System.out.println(FOUND_END);
-            unvisited.remove(CURRENT);
 
+            FOUND_END = checkNodes(Diagonals);               // check all it's neighbors
+            unvisited.remove(CURRENT);
             CURRENT.stat = status.visited;
             visited.add(CURRENT);
 
-            if(FOUND_END)      // if we found the end tile
+            if(FOUND_END) {      // if we found the end tile
+                getShortestPath(Diagonals);
                 return 0;
+            }
         }
         return 1;
     }
