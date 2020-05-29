@@ -132,6 +132,7 @@ public class ToolBar extends JPanel implements ActionListener {
                     clear();
                     return;
                 }
+
                 GRID.update(algo.makeStrings());     // make string and update board
 
 //                try {

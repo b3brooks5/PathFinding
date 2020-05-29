@@ -1,5 +1,7 @@
 package PathFinding.BackEnd.Algiorithms;
 
+import PathFinding.ColorConversions;
+
 import java.util.*;
 
 public class Dijkstra extends Algorithm{
@@ -87,6 +89,7 @@ public class Dijkstra extends Algorithm{
             rhs.distance = CURRENT.distance + 1;
     }
 
+    @Override
     // restart the board with new start and stop points
     public void restart(String[][] rhs){
         visited.clear();
@@ -96,6 +99,7 @@ public class Dijkstra extends Algorithm{
         init(rhs);
     }
 
+    @Override
     // cleared the grid but keeps the same start and stop positions
     public void clear(){
         String[][] work = new String[40][20];       // new empty GRID
@@ -141,6 +145,7 @@ public class Dijkstra extends Algorithm{
         return false;
     }
 
+    @Override
     public int step(boolean Diagonals) {             // returns true if end tile found
         for(int i = 0; i < STEP_SIZE; i++) {
             CURRENT = getSmallestDistance();        // get the node with the smallest distance
@@ -208,7 +213,7 @@ public class Dijkstra extends Algorithm{
                     smallest = myMin(smallest, neighbors.get(i));
                 }
             }
-            else{
+            else {
                 System.out.println("ERROR: Working is NULL");
             }
 
@@ -218,6 +223,7 @@ public class Dijkstra extends Algorithm{
         }   // end while loop
     }   // end getShortestPath
 
+    @Override
     // makes the entire GRID into a 2D array of strings based on color of tiles
     public String[][] makeStrings() {
         String[][] ret = new String[40][20];
@@ -225,19 +231,7 @@ public class Dijkstra extends Algorithm{
 
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 20; j++) {
-                if (GRID[i][j].stat == status.unvisited)
-                    ret[i][j] = "lightGrey";
-                else if (GRID[i][j].stat == status.visited)
-                    ret[i][j] = "darkGrey";
-                else if (GRID[i][j].stat == status.wall)
-                    ret[i][j] = "black";
-                else if (GRID[i][j].stat == status.stop)
-                    ret[i][j] = "red";
-                else if (GRID[i][j].stat == status.start)
-                    ret[i][j] = "orange";
-                else if(GRID[i][j].stat == status.path){
-                    ret[i][j] = "blue";
-                }
+                ret[i][j] = ColorConversions.StatusToString(GRID[i][j].getStatus().toString());
             }
         }
         ret[SX][SY] = "orange";     // always show start and stop

@@ -1,5 +1,6 @@
 package PathFinding.GUI;
 import PathFinding.BackEnd.Templates;
+import PathFinding.ColorConversions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,7 +65,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
     public void update(String [][] rhs){        // changes the grid to the new layout
         for(int i = 0; i < width; i++)         // change sll panel colors to new colors
             for(int j = 0; j < height; j++) {
-                grid[i][j].setBackground(makeColor(rhs[i][j]));
+                grid[i][j].setBackground(ColorConversions.makeColor(rhs[i][j]));
             }
         revalidate();
     }
@@ -75,28 +76,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
             for (JPanel t : tiles)
                 t.setBackground(Color.LIGHT_GRAY);
         startSquares();
-    }
-
-    // turns string into a color object
-    private Color makeColor(String color) {
-        switch (color) {
-            case "lightGrey":
-                return Color.LIGHT_GRAY;
-            case "black":
-                return Color.BLACK;
-            case "gray":
-                return Color.GRAY;
-            case "red":
-                return Color.RED;
-            case "blue":
-                return Color.BLUE;
-            case "darkGrey":
-                return Color.darkGray;
-            case "orange":
-                return Color.ORANGE;
-        }
-
-        return Color.WHITE;
     }
 
     // paint the panel as java Color objects
@@ -115,7 +94,7 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
 
         for(int i = 0; i < width; i++)
             for(int j = 0; j < height; j++) {
-                ret[i][j] = color(grid[i][j]);
+                ret[i][j] = ColorConversions.ColorToString(grid[i][j].getBackground());
             }
 
         return ret;
@@ -131,27 +110,6 @@ public class Grid extends JPanel implements MouseMotionListener, MouseListener {
                 System.out.printf("\"%s\", ", p[j][i]);
             }
         }
-    }
-
-    // change Java Color to a string of that color
-    private String color(JPanel t) {
-        Color c = t.getBackground();
-
-        if(c.equals(Color.BLACK))
-            return "black";
-        else if(c.equals(Color.LIGHT_GRAY))
-            return "lightGrey";
-        else if(c.equals(Color.DARK_GRAY))
-            return "darkgrey";
-        else if(c.equals(Color.GRAY))
-            return "gray";
-        else if(c.equals(Color.RED))
-            return "red";
-        else if(c.equals(Color.BLUE))
-            return "blue";
-        else if(c.equals((Color.ORANGE)))
-            return "orange";
-        else return "empty";
     }
 
     // return true if you are in the panel
