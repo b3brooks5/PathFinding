@@ -2,10 +2,7 @@ package PathFinding.BackEnd.Algiorithms;
 
 import PathFinding.ColorConversions;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Scanner;
+import java.util.*;
 
 public class AStar extends Algorithm {
     enum status {unvisited, visited, wall, stop, start, path}
@@ -13,8 +10,8 @@ public class AStar extends Algorithm {
     private PriorityQueue<NODE> calculated = new PriorityQueue<>();
     private ArrayList<NODE> visited = new ArrayList<>();
     private ArrayList<NODE> unvisited = new ArrayList<>();
-    private NODE CURRENT;
-    private int SIZE_RUN = 10;
+    private NODE CURRENT, END;
+    private int SIZE_RUN = 20;
 
     public AStar(String[][] strings){
         init(strings);
@@ -23,57 +20,77 @@ public class AStar extends Algorithm {
     // initializes new unvisited list for searching
     private void init(String[][] strings) {
         for (int x = 0; x < strings.length; x++){
-            for(int y = 0; y < strings[0].length; y++){
+            for(int y = 0; y < strings[0].length; y++){ // start and stop need to be found first so Scores can be calculated
 
                 if(strings[x][y].equals("orange")){      // save start and end points
                     StartX = x;
                     StartY = y;
-                    calculated.add(new NODE(x, y, makeStatus(strings[x][y]), 0));    //start is always 0
                 }
                 else if(strings[x][y].equals("red")){
                     EndX = x;
                     EndY = y;
-                    unvisited.add(new NODE(x, y, makeStatus(strings[x][y]), 1000));
-                }
-                else {
-                    // always add to unvisited
-                    unvisited.add(new NODE(x, y, makeStatus(strings[x][y]), 1000));
                 }
             }
         }
 
+        calculated.add(new NODE(StartX, StartY, makeStatus(strings[StartX][StartY]), 0));    //start is always 0
+        unvisited.add(new NODE(EndX, EndY, makeStatus(strings[EndX][EndY]), 1000));
+
+        for (int x = 0; x < strings.length; x++){
+            for(int y = 0; y < strings[0].length; y++){
+                if(!strings[x][y].equals("orange") && !strings[x][y].equals("red"))
+                    unvisited.add(new NODE(x, y, makeStatus(strings[x][y]), 1000)); // add all other nodes
+            }
+        }
         CURRENT = null;
     }
 
     // return converted status
     private status makeStatus(String str){
-        if(str.equals("black"))
-            return status.wall;
-        else if(str.equals("orange"))
-            return status.start;
-        else if(str.equals("red"))
-            return status.stop;
-        else
-            return status.unvisited;  // default to unknown
+        switch (str) {
+            case "black":
+                return status.wall;
+            case "orange":
+                return status.start;
+            case "red":
+                return status.stop;
+            default:
+                return status.unvisited;  // default to unknown
+        }
     }
 
-    // retrieves one node
-    private NODE getNODE(int x, int y){
-        for(NODE n : unvisited){
-            if(n.X == x && n.Y == y)
+    // retrieves one node in given collection
+    private <T extends Collection<NODE> > NODE getNODE(int x, int y, T container){
+        for(NODE n : container) {
+            if(n.X == x && n.Y == y && n.stat != status.wall)
                 return n;
         }
-        return null;    // if node not in unvisited
+        return null;    // if node not in collection
     }
 
+    // scores the node based on it;s position relative to the end node
     public void score(int x, int y, int d){
-        NODE working = getNODE(x, y);
+        NODE working = getNODE(x, y, unvisited);
 
         if(working != null) {
             working.setDistance(d + 1);
+
             if(working.stat != status.stop)
                 working.stat = status.visited;
-            calculated.add(working);
+
+            calculated.add(working);        // it's score has now been calculated
+            unvisited.remove(working);
+        }
+        else {
+            working = getNODE(x, y, calculated);
+
+            if(working != null) {
+                if(working.Distance > d + 1) {
+                    calculated.remove(working);
+                    working.setDistance(d+1);
+                    calculated.add(working);
+                }
+            }
         }
     }
 
@@ -84,80 +101,94 @@ public class AStar extends Algorithm {
         score(CURRENT.X, CURRENT.Y + 1, CURRENT.Distance);
         score(CURRENT.X, CURRENT.Y -1 , CURRENT.Distance);
 
-        if(Diagonals){
+        if(Diagonals){      // if we are allowing diagonals
             score(CURRENT.X + 1, CURRENT.Y -1, CURRENT.Distance);
             score(CURRENT.X - 1, CURRENT.Y + 1, CURRENT.Distance);
-            score(CURRENT.X - 1 , CURRENT.Y + 1, CURRENT.Distance);
-            score(CURRENT.X + 1, CURRENT.Y -1 , CURRENT.Distance);
+            score(CURRENT.X - 1 , CURRENT.Y - 1, CURRENT.Distance);
+            score(CURRENT.X + 1, CURRENT.Y + 1 , CURRENT.Distance);
         }
     }
 
+    // retrieves the smallest neighbor based on distance
     private NODE getSmallestNeighbor(NODE center, boolean Diagonals){
-        PriorityQueue<NODE> neighbors = new PriorityQueue<NODE>(new DistanceComparator());
+        PriorityQueue<NODE> neighbors = new PriorityQueue<>(new DistanceComparator());
         NODE working;
-        working = getNODE(center.X + 1, center.Y);
+
+
+
+        working = getNODE(center.X + 1, center.Y, visited);
         if (working != null)
             neighbors.add(working);
 
-        working = getNODE(center.X - 1, center.Y);
-        if (working != null)
-            neighbors.add(working);
-        working = getNODE(center.X, center.Y + 1);
+        working = getNODE(center.X - 1, center.Y, visited);
         if (working != null)
             neighbors.add(working);
 
-        working = getNODE(center.X, center.Y - 1);
+        working = getNODE(center.X, center.Y + 1, visited);
+        if (working != null)
+            neighbors.add(working);
+
+        working = getNODE(center.X, center.Y - 1, visited);
         if(working != null)
             neighbors.add(working);
 
         if(Diagonals){
-            neighbors.add(getNODE(center.X + 1, center.Y - 1));
-            neighbors.add(getNODE(center.X - 1, center.Y + 1));
-            neighbors.add(getNODE(center.X - 1, center.Y + 1));
-            neighbors.add(getNODE(center.X - 1, center.Y - 1));
+            working = getNODE(center.X + 1, center.Y - 1, visited);
+            if(working != null)
+                neighbors.add(working);
+
+            working = getNODE(center.X - 1, center.Y + 1, visited);
+            if(working != null)
+                neighbors.add(working);
+
+            working = getNODE(center.X + 1, center.Y + 1, visited);
+            if(working != null)
+                neighbors.add(working);
+
+            working = getNODE(center.X - 1, center.Y - 1, visited);
+            if(working != null)
+                neighbors.add(working);
         }
 
-        System.out.println("smallest " +  neighbors.peek());
         NODE ret = neighbors.poll();
-        if(ret.stat == status.path)
+
+        if(ret != null && ret.stat == status.path)
             return neighbors.poll();
         else
             return ret;    // return smallest neighbor
 
     }
 
+    // labels the shortest path as blue
     private void getPath(boolean Diagonals){
-        // from the end node
-        // get it's neighbor with the smallest distance
-        // make it blue
-        // set that one to the current node and reapeat until at start node
-        NODE working = CURRENT;
+        NODE working = CURRENT; // start at stop node
 
-        while (working.X != StartX && working.Y != StartY){
+        while (!(working.X == StartX && working.Y == StartY)){  // while not at start node
             working = getSmallestNeighbor(working, Diagonals);
             working.stat = status.path;
         }
-
-
+        working.stat = status.start;        // set start back to start after we found it
     }
 
+    // makes one 'step' through the array
     @Override
     public int step(boolean Diagonals) {
         for(int i = 0; i < SIZE_RUN; i++){
-            System.out.printf("run: %d\t", i);
-            CURRENT = calculated.poll();
-            if(CURRENT.stat == status.stop) {
-                getPath(Diagonals);
+            CURRENT = calculated.poll();    // nodes that have their shortest distance calculated
+
+            if(CURRENT != null && CURRENT.stat == status.stop) {
+                visited.add(CURRENT);       // stop needs to be added somewhere
+                getPath(Diagonals);         // labels shortest path as blue
                 return 0;
             }
-            System.out.println("Current: " + CURRENT);
-            ScoreSurrounding(Diagonals);
+            ScoreSurrounding(Diagonals);    // give the surrounding nodes a score
 
-            visited.add(CURRENT);
+            visited.add(CURRENT);           // current has been visited and won't need to be again
+            //printDistanceScore();
             CURRENT = null;
         }
 
-        return 1;
+        return 1;   // step completed but stop NODE not found yet
     }
 
     // returns an array of strings
@@ -171,12 +202,24 @@ public class AStar extends Algorithm {
         for(NODE n : visited)
             ret[n.X][n.Y] = ColorConversions.StatusToString(n.stat.toString());
 
+        for(NODE n : calculated)
+            ret[n.X][n.Y] = ColorConversions.StatusToString(n.stat.toString());
+
         return ret;
     }
 
+    // clears the board but keeps the start and stop points
     @Override
     public void clear() {
+        String[][] work = new String[40][20];       // new empty GRID
 
+        for (String[] strings : work) {
+            Arrays.fill(strings, "lightGrey");
+        }
+        work[StartX][StartY] = "orange";        // use old start, stop
+        work[EndX][EndY] = "red";
+
+        restart(work);
     }
 
     // restarts board based on new rhs
@@ -184,6 +227,7 @@ public class AStar extends Algorithm {
     public void restart(String[][] rhs) {
         visited.clear();
         unvisited.clear();
+        calculated.clear();
         init(rhs);
     }
 
@@ -193,13 +237,34 @@ public class AStar extends Algorithm {
 
         for (int i = 0; i < p[0].length; i++){
             System.out.println();
-            for(int j = 0; j < p.length; j++){
-                System.out.printf("%-10s, ", p[j][i]);
+            for (String[] strings : p) {
+                System.out.printf("%-10s, ", strings[i]);
             }
         }
     }
 
-    private class NODE implements Comparable {
+    // prints array of distances and scores
+    public void printDistanceScore(){
+        NODE[][] ret = new NODE[40][20];
+
+        for(NODE n : unvisited)
+            ret[n.X][n.Y] = n;
+
+        for(NODE n : visited)
+            ret[n.X][n.Y] = n;
+
+        for(NODE n : calculated)
+            ret[n.X][n.Y] = n;
+
+        for (int i = 0; i < ret[0].length; i++){
+            System.out.println();
+            for (NODE[] nodes : ret) {
+                System.out.printf("%-5d %-5d, ", nodes[i].Distance, nodes[i].Score);
+            }
+        }
+    }
+
+    private class NODE implements Comparable<NODE> {
         status stat;
         int X, Y;
         int Distance, Score;
@@ -224,7 +289,7 @@ public class AStar extends Algorithm {
 
         // estimates the distance of the shortest path assuming the shortest path uses this NODE
         private int calcScore(){
-            return getHeuristic() + Distance;       // estimated distance to go plus current distance
+            return getHeuristic();// + Distance;       // estimated distance to go plus current distance
         }
 
         // returns estimated distance to the end from current NODE
@@ -241,16 +306,21 @@ public class AStar extends Algorithm {
         }
 
         @Override
-        public int compareTo(Object o) {
-            return this.Score - ((NODE)o).Score;
+        public int compareTo(NODE rhs) {
+//            if(Distance == rhs.Distance)
+//                return Score - rhs.Score;
+//            else
+//                return Distance - rhs.Distance;
+            if(Score - rhs.Score == 0)
+                return Distance - rhs.Distance;
+            else
+                return Score - rhs.Score;
         }
-
-
     }
-    class DistanceComparator implements Comparator{
+    class DistanceComparator implements Comparator<NODE> {
         @Override
-        public int compare(Object o, Object t1) {
-            return ((NODE)o).Distance - ((NODE)t1).Distance;
+        public int compare(NODE left, NODE right) {
+            return left.Distance - right.Distance;
         }
     }
 }

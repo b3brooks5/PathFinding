@@ -1,7 +1,6 @@
 package PathFinding;
 import PathFinding.BackEnd.Templates;
 import PathFinding.GUI.*;
-import javafx.scene.control.RadioButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        JFrame frame = new JFrame("Path Finding");
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setSize(900, 600);
 
@@ -17,7 +16,7 @@ public class Main {
 
         Templates temp = new Templates();
         JRadioButton Dijkstra = new JRadioButton("Dijkstra's", true);
-        JRadioButton Astar = new JRadioButton("A*");;
+        JRadioButton Astar = new JRadioButton("A*");
 
         Grid grid = new Grid(temp);
 

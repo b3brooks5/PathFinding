@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class ToolBar extends JPanel implements ActionListener {
     Grid GRID;      // same grid in grid.java
-    boolean RUNNING = false, DIAGONALS = false, RUN = false;
+    boolean RUNNING = false, DIAGONALS = true, RUN = false;
     double distance;
     String speed;
     Templates temp;
@@ -31,7 +31,7 @@ public class ToolBar extends JPanel implements ActionListener {
         setLayout(new GridLayout(3, 3));
         GridBagConstraints c = new GridBagConstraints();
 
-        check = new JCheckBox("Allow Diagonals", false);
+        check = new JCheckBox("Allow Diagonals", true);
         check.addActionListener(this);
         add(check, c);
 
@@ -41,7 +41,7 @@ public class ToolBar extends JPanel implements ActionListener {
         JLabel l = new JLabel("Diagonal Distance");
 
         Double[] sizeOptions = {1.0, 1.5, 2.0, 2.1, 2.5, 5.0};
-        Dbox = new JComboBox<Double>(sizeOptions);
+        Dbox = new JComboBox<>(sizeOptions);
         Dbox.setSelectedIndex(0);
         Dbox.addActionListener(this);
 
@@ -57,7 +57,7 @@ public class ToolBar extends JPanel implements ActionListener {
         p2.setLayout(new GridLayout(1, 2));
 
         String[] speedOptions = {"slow", "normal", "fast", "finish"};   // drop box for speed
-        JComboBox<String> speed = new JComboBox<String>(speedOptions);
+        JComboBox<String> speed = new JComboBox<>(speedOptions);
         speed.setSelectedIndex(3);
 
         JLabel s = new JLabel("Speed");
@@ -112,10 +112,8 @@ public class ToolBar extends JPanel implements ActionListener {
 
             RUNNING = true;         // true if currently finding path, needs to block other buttons from executing
 
-            if(Dijkstra.isSelected()){
-                System.out.println("Creating Dikjkastras");
+            if(Dijkstra.isSelected())
                 algo = new Dijkstra(GRID.makeStrings());
-            }
             else if (AStar.isSelected())
                 algo = new AStar(GRID.makeStrings());
             else{
@@ -124,7 +122,7 @@ public class ToolBar extends JPanel implements ActionListener {
             }
 
 
-            while(stepping == 1){                       // while you can still step
+            while(stepping == 1){ // while you can still step
                 stepping = algo.step(DIAGONALS);
 
                 if(stepping == -1){     // the stop tile cannot be reached
@@ -144,7 +142,6 @@ public class ToolBar extends JPanel implements ActionListener {
             temp.startOver();
             RUN = true;
 
-            //algo.getShortestPath(DIAGONALS);
             GRID.update(algo.makeStrings());
 
             RUNNING = false;            // program is now no longer running
