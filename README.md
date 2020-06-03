@@ -1,4 +1,4 @@
-# PathFindingGUI
+# GUI
 ![](Example.png)
 
 This program creates a visual representation of two path finding algorithms (Dijkstra and A*) and lets the user interact and change 
