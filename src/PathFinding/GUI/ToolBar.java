@@ -16,8 +16,10 @@ public class ToolBar extends JPanel implements ActionListener {
     double distance;
     String speed;
     Templates temp;
+    Integer Distance;
 
-    // GUI buttons
+    // GUI buttons'
+    JLabel DLabel, dis;
     JRadioButton Dijkstra, AStar;
     JButton refresh, clear, play, template;
     JCheckBox check;
@@ -25,7 +27,7 @@ public class ToolBar extends JPanel implements ActionListener {
     Algorithm algo;
     JComboBox<Double> Dbox;
 
-    public ToolBar(Grid grid, Templates t, JRadioButton Dij, JRadioButton As) {
+    public ToolBar(Grid grid, Templates t, JRadioButton Dij, JRadioButton As, Integer d) {
         super();
 
         setLayout(new GridLayout(3, 3));
@@ -56,14 +58,12 @@ public class ToolBar extends JPanel implements ActionListener {
         JPanel p2 = new JPanel();
         p2.setLayout(new GridLayout(1, 2));
 
-        String[] speedOptions = {"slow", "normal", "fast", "finish"};   // drop box for speed
-        JComboBox<String> speed = new JComboBox<>(speedOptions);
-        speed.setSelectedIndex(3);
 
-        JLabel s = new JLabel("Speed");
-
-        p2.add(s);
-        p2.add(speed);
+        Distance = d;
+        DLabel = new JLabel("Distance");
+        dis = new JLabel(Distance.toString());
+        p2.add(DLabel);
+        p2.add(dis);
 
         add(p2, c);
 
@@ -133,16 +133,14 @@ public class ToolBar extends JPanel implements ActionListener {
 
                 GRID.update(algo.makeStrings());     // make string and update board
 
-//                try {
-//                    TimeUnit.SECONDS.sleep(1);
-//                } catch (InterruptedException ex) {
-//                    ex.printStackTrace();
-//                }
             }
             temp.startOver();
             RUN = true;
 
             GRID.update(algo.makeStrings());
+            Distance = algo.getDistance();
+            dis.setText(Distance.toString());
+
 
             RUNNING = false;            // program is now no longer running
         }

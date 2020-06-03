@@ -5,9 +5,10 @@ import PathFinding.GUI.*;
 import javax.swing.*;
 import java.awt.*;
 
-
 public class Main {
     public static void main(String[] args) {
+        Integer Distance = 0;
+
         JFrame frame = new JFrame("Path Finding");
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setSize(900, 600);
@@ -22,14 +23,13 @@ public class Main {
 
         frame.add(grid, BorderLayout.CENTER);
 
-        ToolBar t = new ToolBar(grid, temp, Dijkstra, Astar);
+        ToolBar t = new ToolBar(grid, temp, Dijkstra, Astar, Distance);
         frame.add(t, BorderLayout.NORTH);
 
         AlgorithmsSideBar algo = new AlgorithmsSideBar(Dijkstra, Astar);
         frame.add(algo, BorderLayout.WEST);
 
         frame.setResizable(false);
-
         frame.setVisible(true);
     }
 }

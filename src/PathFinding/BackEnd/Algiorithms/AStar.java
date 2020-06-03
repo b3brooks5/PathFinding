@@ -231,6 +231,15 @@ public class AStar extends Algorithm {
         init(rhs);
     }
 
+    @Override
+    public int getDistance() {
+        NODE  ret = getNODE(EndX, EndY, unvisited);
+        if(ret != null)
+            return ret.Distance;
+        else
+            return 0;
+    }
+
     // prints strings for debugging
     public void printStrings(){
         String[][] p = makeStrings();

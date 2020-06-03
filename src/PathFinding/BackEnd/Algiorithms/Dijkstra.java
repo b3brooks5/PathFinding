@@ -8,8 +8,8 @@ public class Dijkstra extends Algorithm{
     private enum status { unvisited, visited, wall, start, stop, path }     // nodes status
     private NODE[][] GRID = new NODE[40][20];    // grid to find path in
     boolean FOUND_END = false;                   // only true if found true and done
-    HashSet<NODE> visited = new HashSet<NODE>();    // nodes that have been visited
-    HashSet<NODE> unvisited = new HashSet<NODE>();  // nodes that have not been visited
+    HashSet<NODE> visited = new HashSet<>();    // nodes that have been visited
+    HashSet<NODE> unvisited = new HashSet<>();  // nodes that have not been visited
     NODE CURRENT;           // the current node that we are checking it's neighbors
     int SX, SY, EX, EY;     // coordinates of the start and stop tiles
     int STEP_SIZE = 10;     // how many squares to set with each iteration
@@ -37,14 +37,16 @@ public class Dijkstra extends Algorithm{
 
     // return converted status
     private status makeStatus(String str){
-        if(str.equals("black"))
-            return status.wall;
-        else if(str.equals("orange"))
-            return status.start;
-        else if(str.equals("red"))
-            return status.stop;
-        else
-            return status.unvisited;  // default to unknown
+        switch (str) {
+            case "black":
+                return status.wall;
+            case "orange":
+                return status.start;
+            case "red":
+                return status.stop;
+            default:
+                return status.unvisited;  // default to unknown
+        }
     }
 
     // sets coordinate of the start index
@@ -179,7 +181,7 @@ public class Dijkstra extends Algorithm{
         ArrayList<NODE> neighbors = new ArrayList<>();      // stores the neighbors of the current
         NODE smallest = null;                                // node for changing values
 
-        while(current.distance != 0.0) {
+        while(current != null && current.distance != 0.0) {
             if (current.X + 1 < 40)                                // if statements grab all neighboring nodes
                 neighbors.add(GRID[current.X + 1][current.Y]);          // and first checks if they are in the grid
                                                                         // and not null
@@ -238,6 +240,11 @@ public class Dijkstra extends Algorithm{
         ret[EX][EY] = "red";
 
         return ret;
+    }
+
+    @Override
+    public int getDistance() {
+        return (int)GRID[EX][EY].distance;
     }
 
     // changes sets "visited" and "unvisited" into a 2D array
@@ -327,9 +334,7 @@ public class Dijkstra extends Algorithm{
         @Override
         public boolean equals(Object o){
             if(o.getClass() == getClass()) {
-                if (X == ((NODE) o).X && Y == ((NODE) o).Y)
-                    return true;
-                else return false;
+                return X == ((NODE) o).X && Y == ((NODE) o).Y;
             }
             else {
                 return false;
