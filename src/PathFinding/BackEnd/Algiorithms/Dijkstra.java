@@ -142,8 +142,6 @@ public class Dijkstra extends Algorithm{
         oneNode(CURRENT.X + 1, CURRENT.Y);
         oneNode(CURRENT.X - 1, CURRENT.Y);
 
-
-
         return false;
     }
 
