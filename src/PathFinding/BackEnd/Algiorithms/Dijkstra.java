@@ -234,6 +234,7 @@ public class Dijkstra extends Algorithm{
                 ret[i][j] = ColorConversions.StatusToString(GRID[i][j].getStatus().toString());
             }
         }
+
         ret[SX][SY] = "orange";     // always show start and stop
         ret[EX][EY] = "red";
 
